@@ -1,0 +1,76 @@
+Symbol,Company Name,Index Weight
+AAPL,Apple Inc.,0.1518
+MSFT,Microsoft Corp,0.1233
+FB,Facebook Inc A,0.0633
+GOOG,Alphabet Inc C,0.0552
+GOOGL,Alphabet Inc A,0.0549
+V,Visa Inc A,0.0371
+T,AT&T Inc,0.0348
+INTC,Intel Corp,0.0343
+VZ,Verizon Communications Inc,0.0321
+CSCO,Cisco Systems Inc,0.0299
+MA,Mastercard Inc A,0.0274
+NVDA,Nvidia Corp,0.0227
+ORCL,Oracle Corp,0.0215
+IBM,Intl Business Machines Corp,0.0187
+ADBE,Adobe Systems Inc,0.0185
+TXN,Texas Instruments Inc,0.0164
+ACN,Accenture plc A,0.0153
+CRM,Salesforce.com,0.0148
+QCOM,QUALCOMM Inc,0.0144
+PYPL,PayPal Holdings Inc.,0.0141
+AVGO,Broadcom Inc,0.013
+MU,Micron Technology Inc,0.0091
+ADP,Automatic Data Processing,0.0088
+ATVI,Activision Blizzard Inc,0.0081
+INTU,Intuit Inc,0.0074
+AMAT,Applied Materials Inc,0.0073
+CTSH,Cognizant Tech Solutions Corp,0.0068
+EA,Electronic Arts,0.006
+HPQ,HP Inc,0.0057
+ADI,Analog Devices Inc,0.0053
+FIS,Fidelity National Information,0.0051
+TEL,TE Connectivity Ltd.,0.0048
+EBAY,eBay Inc.,0.0046
+FISV,Fiserv Inc,0.0046
+LRCX,Lam Research Corp,0.0046
+ADSK,Autodesk Inc,0.0043
+APH,Amphenol Corp A,0.0042
+GLW,Corning Inc,0.004
+RHT,Red Hat Inc,0.0037
+DXC,DXC Technology Company,0.0037
+HPE,Hewlett Packard Enterprise Co,0.0036
+MCHP,Microchip Technology Inc,0.0033
+NTAP,NetApp Inc,0.0033
+PAYX,Paychex Inc,0.0033
+TWTR,Twitter Inc,0.0031
+WDC,Western Digital Corp,0.003
+FLT,FleetCor Technologies Inc,0.0029
+KLAC,KLA-Tencor Corporation,0.0028
+MSI,Motorola Solutions Inc,0.0028
+GPN,Global Payments Inc,0.0028
+CTL,CenturyLink Inc,0.0027
+XLNX,Xilinx Inc,0.0027
+SWKS,Skyworks Solutions Inc,0.0026
+STX,Seagate Technology,0.0023
+TSS,Total System Services Inc,0.0023
+AMD,Advanced Micro Devices,0.0023
+VRSN,VeriSign Inc,0.0022
+ANSS,ANSYS Inc,0.0022
+CTXS,Citrix Systems Inc,0.0021
+TTWO,Take-Two Interactive Software,0.0021
+CA,CA Inc,0.002
+SNPS,Synopsys Inc,0.002
+BR,Broadridge Financial Solutions Inc.,0.002
+AKAM,Akamai Technologies Inc,0.0019
+IT,Gartner Inc,0.0019
+CDNS,Cadence Design Systems Inc,0.0019
+SYMC,Symantec Corp,0.0018
+ADS,Alliance Data Systems Corp,0.0016
+FFIV,F5 Networks Inc,0.0016
+QRVO,"Qorvo, Inc",0.0016
+JNPR,Juniper Networks Inc,0.0014
+WU,Western Union Co,0.0013
+FLIR,FLIR Systems Inc,0.0012
+IPGP,IPG Photonics Corp,0.001
+XRX,Xerox Corp,0.0008

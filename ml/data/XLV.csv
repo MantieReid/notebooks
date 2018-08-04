@@ -1,0 +1,64 @@
+Symbol,Company Name,Index Weight
+JNJ,Johnson & Johnson,0.1015
+UNH,Unitedhealth Group Inc,0.0709
+PFE,Pfizer Inc,0.068
+MRK,Merck & Co Inc,0.0509
+ABBV,AbbVie Inc.,0.042
+AMGN,Amgen Inc,0.0378
+MDT,Medtronic plc,0.0351
+ABT,Abbott Laboratories,0.0328
+GILD,Gilead Sciences Inc,0.0291
+BMY,Bristol-Myers Squibb,0.0277
+LLY,Lilly Eli & Co,0.0276
+TMO,Thermo Fisher Scientific,0.0269
+BIIB,Biogen Inc,0.0208
+BDX,Becton Dickinson & Co,0.0189
+ANTM,Anthem Inc,0.0189
+CVS,CVS Health Corporation,0.0189
+CELG,Celgene Corp,0.0183
+AGN,Allergan plc,0.0181
+DHR,Danaher Corp,0.0179
+AET,Aetna Inc,0.0177
+ISRG,Intuitive Surgical Inc,0.017
+SYK,Stryker Corp,0.0152
+ILMN,Illumina Inc,0.014
+BSX,Boston Scientific Corp,0.0133
+CI,Cigna Corporation,0.0132
+HUM,Humana Inc,0.0128
+VRTX,Vertex Pharmaceuticals Inc,0.0128
+ZTS,Zoetis Inc,0.0127
+ESRX,Express Scripts Holding Co.,0.0125
+HCA,HCA Healthcare Inc,0.0104
+BAX,Baxter Intl Inc,0.0102
+EW,Edwards Lifesciences Corp,0.0088
+REGN,Regeneron Pharmaceuticals Inc,0.0088
+ALXN,Alexion Pharmaceuticals Inc,0.0079
+CNC,Centene Corp,0.0079
+ALGN,Align Technology Inc,0.0075
+MCK,McKesson Corp,0.0073
+ZBH,Zimmer Biomet Holdings Inc,0.0073
+A,Agilent Technologies Inc,0.006
+CERN,Cerner Corp,0.006
+IDXX,IDEXX Laboratories Inc,0.006
+MYL,Mylan NV,0.0057
+IQV,IQVIA Holdings Inc,0.0057
+LH,Lab Corp of America Hldgs,0.0053
+ABMD,Abiomed Inc,0.0046
+CAH,Cardinal Health Inc,0.0045
+WAT,Waters Corp,0.0044
+MTD,Mettler-Toledo Intl,0.0043
+RMD,ResMed Inc,0.0043
+DGX,Quest Diagnostics,0.0042
+ABC,AmerisourceBergen Corp,0.0038
+COO,Cooper Companies Inc,0.0037
+HSIC,Schein Henry Inc,0.0035
+HOLX,Hologic Inc,0.0033
+INCY,Incyte Corp,0.0032
+XRAY,Dentsply Sirona Inc.,0.0031
+UHS,Universal Health Services B,0.0031
+DVA,DaVita Inc,0.003
+VAR,Varian Medical Systems Inc,0.003
+PRGO,Perrigo Company plc,0.0029
+PKI,PerkinElmer Inc,0.0027
+NKTR,Nektar Therapeutics,0.0025
+EVHC,Envision Healthcare Corp,0.0015
