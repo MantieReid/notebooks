@@ -114,6 +114,70 @@ scaler.transform(X_train)
 clf = MLPRegressor(hidden_layer_sizes=(1024, 1024), solver="sgd", activation="tanh",
                    alpha=0.0001, batch_size=64, max_iter=10000, tol=0.00001, shuffle=True)
 '''
+# ************************************************************
+# neural network with tensorflow
+# ************************************************************
+import tensorflow as tf
+import keras
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
+from keras.wrappers.scikit_learn import KerasRegressor
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import KFold
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+
+config = tf.ConfigProto( device_count = {'GPU': 1 , 'CPU': 4} ) 
+sess = tf.Session(config=config) 
+keras.backend.set_session(sess)
+
+from tensorflow.python.client import device_lib
+#print(device_lib.list_local_devices())
+from keras import backend as keras_backend
+#print(keras_backend.tensorflow_backend._get_available_gpus())
+
+# fix random seed for reproducibility
+seed = 7
+np.random.seed(seed)
+
+def baseline_model():
+    # create model
+    model = Sequential()
+    model.add(Dense(256, 
+                    input_dim=len(df_features.columns), 
+                    kernel_initializer='normal', 
+                    activation='sigmoid'))
+    model.add(Dropout(0.2))
+    model.add(Dense(256, 
+                    input_dim=len(df_features.columns), 
+                    kernel_initializer='normal', 
+                    activation='sigmoid'))
+    model.add(Dropout(0.2))
+    model.add(Dense(256, 
+                    input_dim=len(df_features.columns), 
+                    kernel_initializer='normal', 
+                    activation='sigmoid'))
+    model.add(Dropout(0.2))
+    model.add(Dense(1, 
+                    kernel_initializer='normal'))
+    # Compile model
+    model.compile(loss='mean_squared_error', optimizer='adam')
+    return model
+
+step_scaler = StandardScaler()
+step_regressor = KerasRegressor(build_fn=baseline_model, epochs=100, batch_size=8, verbose=2)
+steps = []
+steps.append(('step_scaler', step_scaler))
+steps.append(('step_regressor', step_regressor))
+pipeline = Pipeline(steps)
+clf = pipeline
+# kfold = KFold(n_splits=3, random_state=seed)
+# cross_val_scores = cross_val_score(pipeline, X_train, y_train, cv=kfold)
+# Results: -19376733.79 (49264686.37) MSE (no scaling)
+# Results: -144.28 (148.91) MSE (relu, [62*1])
+# Results: -59.37 (44.19) MSE (sigmoid, [62*1])
+# Results: -87.21 (28.69) MSE (sigmoid, [62,32,1]) - deeper
+# Results: -53.58 (32.51) MSE (sigmoid, [512,1]) - wider
 
 clf.fit(X_train, y_train)
 print('Accuracy on training set: {:.2f}'.format(clf.score(X_train, y_train)))
@@ -132,10 +196,11 @@ plt.plot(df_test_plot['date'], df_test_plot['ivol'], label='', c="cornflowerblue
 plt.plot(df_test_plot['date'], df_test_plot['model'], label='predictions', c="green", linewidth=2)
 plt.title(str(clf).split('(')[0] + " @ " + target)
 plt.legend()
-#plt.show()
+plt.show()
 plt.savefig(target + "_plot.png")
 
 # show tree
+'''
 from sklearn.externals.six import StringIO  
 from IPython.display import Image  
 from sklearn.tree import export_graphviz
@@ -149,63 +214,3 @@ graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
 img = Image(graph.create_png())
 with open(target + "_tree.png", "wb") as png:
     png.write(img.data)
-    
-# ************************************************************
-# neural network with tensorflow
-# ************************************************************
-import tensorflow as tf
-from sklearn.preprocessing import MinMaxScaler
-X_scaler = MinMaxScaler()
-y_scaler = MinMaxScaler()
-X_train_scaled = X_scaler.fit_transform(X_train)
-X_test_scaled = X_scaler.transform(X_test)
-y_train_scaled = y_scaler.fit_transform(y_train.reshape(-1, 1))
-y_test_scaled = y_scaler.transform(y_test.reshape(-1, 1))
-
-def neural_net_model(X_data, input_dim):
-    """
-    neural_net_model is function applying 2 hidden layer feed forward neural net.
-    Weights and biases are abberviated as W_1, W_2 and b_1, b_2 
-    These are variables with will be updated during training.
-    """ 
-    W_1 = tf.Variable(tf.random_uniform([input_dim, 10]))
-    b_1 = tf.Variable(tf.zeros([10]))
-    layer_1 = tf.add(tf.matmul(X_data, W_1), b_1)
-    layer_1 = tf.nn.relu(layer_1)
-    # layer 1 multiplying and adding bias then activation function
-    W_2 = tf.Variable(tf.random_uniform([10,10]))
-    b_2 = tf.Variable(tf.zeros([10]))
-    layer_2 = tf.add(tf.matmul(layer_1, W_2), b_2)
-    layer_2 = tf.nn.relu(layer_2)
-    # layer 2 multiplying and adding bias then activation function
-    W_O = tf.Variable(tf.random_uniform([10,1]))
-    b_O = tf.Variable(tf.zeros([1]))
-    output = tf.add(tf.matmul(layer_2, W_O), b_O)
-    # O/p layer multiplying and adding bias then activation function
-    # notice output layer has one node only since performing regression
-    return output
-
-xs = tf.placeholder("float")
-ys = tf.placeholder("float")
-output = neural_net_model(xs, 3)
-# Cost function to minimize: mean squared error
-cost = tf.reduce_mean(tf.square(output-ys))
-train = tf.train.GradientDescentOptimizer(0.001).minimize(cost)
-# Gradinent Descent optimization for updating weights and biases
-
-with tf.Session() as sess:
-    # Initiate session and initialize all vaiables
-    sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver()
-    #saver.restore(sess,'yahoo_dataset.ckpt')
-    for i in range(100):
-        for j in range(X_train.shape[0]):
-            sess.run([cost,train],feed_dict=    {xs:X_train[j,:].reshape(1,3), ys:y_train[j]})
-            # Run cost and train with each sample
-        c_t.append(sess.run(cost, feed_dict={xs:X_train,ys:y_train}))
-        c_test.append(sess.run(cost, feed_dict={xs:X_test,ys:y_test}))
-        print('Epoch :', i, 'Cost :', c_t[i])
-    pred = sess.run(output, feed_dict={xs:X_test})
-    # predict output of test data after training
-    print('Cost :',sess.run(cost, feed_dict={xs:X_test,ys:y_test}))
-    #saver.save(sess,'tfmodel.ckpt')
