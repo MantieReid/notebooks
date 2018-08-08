@@ -6,81 +6,44 @@ os.chdir("C:/Users/rhome/github/notebooks/ml/")
 # load data
 df_macro = pd.read_csv('data/macro.csv').set_index('date').dropna(axis=1, how='all')
 df_sector = pd.read_csv('data/sector.csv').set_index('date').dropna(axis=1, how='all')
+df_gdx = pd.read_csv('data/GDXd.csv').set_index('date').dropna(axis=1, how='all')
 df_xlk = pd.read_csv('data/XLKd.csv').set_index('date').dropna(axis=1, how='all')
-df_all = df_macro.join(df_sector, how='inner')
+df_all = df_macro.join(df_sector, how='inner').join(df_gdx, how='inner').join(df_xlk, how='inner')
 
-df_all = df_all[['GDX.ivol',
-        'CL1.rvol10D', 
-        'CL1.spot',
-        'DXY.rvol10D',
-        'DXY.spot',
-        'EEM.ivol',
-        'EEM.ivol90',
-        'EEM.pucallopeninterestratio',
-        'EEM.putcallvolumeratio',
-        'EEM.rvol10D',
-        'EEM.rvol30D',
-        'EEM.spot',
-        'EEM.volume',
-        'FDN.shortint',
-        'FDN.shortintratio',
-        'GDX.putcallvolumeratio',
-        'GDX.shortint',
-        'GDX.shortintratio',
-        'GDX.spot',
-        'IBB.shortint',
-        'IBB.shortintratio',
-        'SPX.ivol',
-        'SPX.putcallvolumeratio',
-        'SPX.spot',
-        'SPX.volume',
-        'USSW10.rvol10D',
-        'USSW10.spot',
-        'VFH.shortint',
-        'VGT.putcallvolumeratio',
-        'VGT.shortint',
-        'VGT.shortintratio',
-        'VHT.shortint',
-        'VIX.putcallvolumeratio',
-        'VIX.rvol10D',
-        'VIX.spot',
-        'VNQ.shortint',
-        'XAG.rvol10D',
-        'XAG.spot',
-        'XAU.rvol10D',
-        'XAU.spot',
-        'XLE.putcallvolumeratio',
-        'XLE.shortint',
-        'XLE.shortintratio',
-        'XLE.spot',
-        'XLF.putcallvolumeratio',
-        'XLF.shortint',
-        'XLF.shortintratio',
-        'XLF.spot',
-        'XLI.putcallvolumeratio',
-        'XLI.shortint',
-        'XLI.shortintratio',
-        'XLI.spot',
-        'XLK.putcallvolumeratio',
-        'XLK.shortint',
-        'XLK.shortintratio',
-        'XLK.spot',
-        'XLP.putcallvolumeratio',
-        'XLP.shortint',
-        'XLP.shortintratio',
-        'XLU.shortint',
-        'XLV.putcallvolumeratio',
-        'XLV.shortint',
-        'XLV.shortintratio',
-        'XLV.spot',
-        'XLY.putcallvolumeratio',
-        'XLY.shortint',
-        'XLY.shortintratio',
-        'XLY.spot']]
-
-target = 'GDX.ivol'
+security = 'T_US'
+target = security + '.ivol'
 end_training = pd.to_datetime('2017/01/01')
 
+# features
+# ***************************************************
+# macro
+features_macro = [
+        'CL1.rvol10D', 'CL1.spot',
+        'DXY.rvol10D', 'DXY.spot',
+        'SPX.ivol', 'SPX.putcallvolumeratio', 'SPX.spot', 'SPX.volume',
+        'USSW10.rvol10D', 'USSW10.spot',
+        'VIX.putcallvolumeratio', 'VIX.rvol10D', 'VIX.spot',
+        'XAG.rvol10D', 'XAG.spot',
+        'XAU.rvol10D', 'XAU.spot']
+
+features_sectors = [
+        'EEM.ivol', 'EEM.putcallvolumeratio',
+        'EEM.rvol10D', 'EEM.rvol30D', 'EEM.spot', 'EEM.volume',
+        'FDN.shortintratio',
+        'IBB.shortintratio',
+        'XLE.putcallvolumeratio', 'XLE.shortintratio', 'XLE.spot',
+        'XLF.putcallvolumeratio', 'XLF.shortintratio', 'XLF.spot',
+        'XLI.putcallvolumeratio', 'XLI.shortintratio', 'XLI.spot',
+        'XLK.putcallvolumeratio', 'XLK.shortintratio', 'XLK.spot',
+        'XLP.putcallvolumeratio', 'XLP.shortintratio', 'XLU.shortint',
+        'XLV.putcallvolumeratio', 'XLV.shortintratio', 'XLV.spot',
+        'XLY.putcallvolumeratio', 'XLY.shortintratio', 'XLY.spot']
+
+features_securities = [s + x 
+       for s in [security] + ['VZ_US']
+       for x in ['.ivol', '.putcallvolumeratio', '.shortintratio', '.spot']]
+
+df_all = df_all[features_securities + features_macro + features_sectors]
 df_all = df_all[np.isfinite(df_all[target])]
 df_dates = pd.to_datetime(df_all.reset_index()['date'])
 df_target = df_all[target].reset_index()
@@ -144,20 +107,13 @@ def baseline_model():
     # create model
     model = Sequential()
     model.add(Dense(256, 
-                    input_dim=len(df_features.columns), 
                     kernel_initializer='normal', 
                     activation='sigmoid'))
-    model.add(Dropout(0.2))
-    model.add(Dense(256, 
-                    input_dim=len(df_features.columns), 
+    model.add(Dropout(0.5))
+    model.add(Dense(64, 
                     kernel_initializer='normal', 
                     activation='sigmoid'))
-    model.add(Dropout(0.2))
-    model.add(Dense(256, 
-                    input_dim=len(df_features.columns), 
-                    kernel_initializer='normal', 
-                    activation='sigmoid'))
-    model.add(Dropout(0.2))
+    model.add(Dropout(0.5))
     model.add(Dense(1, 
                     kernel_initializer='normal'))
     # Compile model
@@ -165,7 +121,7 @@ def baseline_model():
     return model
 
 step_scaler = StandardScaler()
-step_regressor = KerasRegressor(build_fn=baseline_model, epochs=100, batch_size=8, verbose=2)
+step_regressor = KerasRegressor(build_fn=baseline_model, epochs=100, batch_size=32, verbose=2)
 steps = []
 steps.append(('step_scaler', step_scaler))
 steps.append(('step_regressor', step_regressor))
@@ -214,3 +170,4 @@ graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
 img = Image(graph.create_png())
 with open(target + "_tree.png", "wb") as png:
     png.write(img.data)
+'''
