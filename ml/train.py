@@ -12,6 +12,7 @@ df_all = df_macro.join(df_sector, how='inner').join(df_gdx, how='inner').join(df
 
 security = 'T_US'
 target = security + '.ivol'
+start_training = pd.to_datetime('2007/01/01')
 end_training = pd.to_datetime('2017/01/01')
 
 # features
@@ -44,6 +45,28 @@ features_securities = [s + x
        for x in ['.ivol', '.putcallvolumeratio', '.shortintratio', '.spot']]
 
 df_all = df_all[features_securities + features_macro + features_sectors]
+
+# compute zscores
+print('Computing zscore...')
+for day in [30, 60, 90, 260]:
+    df_all[security + '.ivol.zscore' + str(day) + 'd'] = \
+        df_all[security + '.ivol'].rolling(day).apply( \
+              lambda x: (x[-1] - x.mean())/x.std(), raw=True) \
+              .fillna(method='bfill')
+
+# compute momentum
+print('Computing momentum...')
+for feature in list(df_all.columns):
+    if '.spot' in feature:
+        for day in [2, 5, 10]:
+            df_all[feature + '.momentum' + str(day) + 'd'] = \
+                df_all[feature].rolling(day).apply( \
+                      lambda x: (x[-1] - x.mean())/x.std(), raw=True) \
+                      .fillna(method='bfill')
+  
+df_all[security + '.ivol.zscore' + str(day) + 'd'] = \
+        df_all[security + '.ivol'].rolling(day).apply(lambda x: (x[-1] - x.mean())/x.std(), raw=True).fillna(method='bfill')
+
 df_all = df_all[np.isfinite(df_all[target])]
 df_dates = pd.to_datetime(df_all.reset_index()['date'])
 df_target = df_all[target].reset_index()
@@ -56,9 +79,9 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import StandardScaler
 
-X_train = df_features[list(df_dates < end_training)].values
-y_train = df_target[list(df_dates < end_training)][target].values
-d_train = df_dates[df_dates < end_training]
+X_train = df_features[list((df_dates >= start_training) & (df_dates < end_training))].values
+y_train = df_target[list((df_dates >= start_training) & (df_dates < end_training))][target].values
+d_train = df_dates[list((df_dates >= start_training) & (df_dates < end_training))]
 X_test = df_features[list(df_dates >= end_training)].values
 y_test = df_target[list(df_dates >= end_training)][target].values
 d_test = df_dates[df_dates >= end_training]
@@ -69,14 +92,6 @@ clf = DecisionTreeRegressor(max_depth=8, min_samples_leaf=5, min_samples_split=5
 # random forest
 #clf = RandomForestRegressor(max_depth=8, n_estimators=20, max_leaf_nodes=50, n_jobs=-1)
 
-# neural network
-'''
-scaler = StandardScaler()
-scaler.fit_transform(X_train)
-scaler.transform(X_train)
-clf = MLPRegressor(hidden_layer_sizes=(1024, 1024), solver="sgd", activation="tanh",
-                   alpha=0.0001, batch_size=64, max_iter=10000, tol=0.00001, shuffle=True)
-'''
 # ************************************************************
 # neural network with tensorflow
 # ************************************************************
@@ -84,6 +99,8 @@ import tensorflow as tf
 import keras
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
+from keras.layers.advanced_activations import ELU, PReLU
+from keras import regularizers
 from keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import KFold
@@ -106,11 +123,11 @@ np.random.seed(seed)
 def baseline_model():
     # create model
     model = Sequential()
-    model.add(Dense(256, 
+    model.add(Dense(64, 
                     kernel_initializer='normal', 
                     activation='sigmoid'))
     model.add(Dropout(0.5))
-    model.add(Dense(64, 
+    model.add(Dense(32, 
                     kernel_initializer='normal', 
                     activation='sigmoid'))
     model.add(Dropout(0.5))
