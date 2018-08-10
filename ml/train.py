@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import os 
 os.chdir("C:/Users/rhome/github/notebooks/ml/")
 
@@ -10,10 +11,22 @@ df_gdx = pd.read_csv('data/GDXd.csv').set_index('date').dropna(axis=1, how='all'
 df_xlk = pd.read_csv('data/XLKd.csv').set_index('date').dropna(axis=1, how='all')
 df_all = df_macro.join(df_sector, how='inner').join(df_gdx, how='inner').join(df_xlk, how='inner')
 
-security = 'T_US'
+security = 'VZ_US'
 target = security + '.ivol'
 start_training = pd.to_datetime('2007/01/01')
 end_training = pd.to_datetime('2017/01/01')
+
+# compute correls of implied vol
+df_ivols = df_all[[x for x in list(df_all.columns) if x.endswith('.ivol')]]
+correls = df_ivols.corr()
+correls_neighbors = correls[security + '.ivol'].nlargest(11)
+# plot
+'''
+correls_neighbors = correls_neighbors.iloc[::-1]
+plt.barh(correls_neighbors.index, correls_neighbors, align='center', alpha=0.8)
+plt.title("Correls of ivol @ " + security)
+plt.show()
+'''
 
 # features
 # ***************************************************
@@ -41,8 +54,9 @@ features_sectors = [
         'XLY.putcallvolumeratio', 'XLY.shortintratio', 'XLY.spot']
 
 features_securities = [s + x 
-       for s in [security] + ['VZ_US']
+       for s in [security]
        for x in ['.ivol', '.putcallvolumeratio', '.shortintratio', '.spot']]
+# features_securities += [x for x in list(correls_neighbors.index) if x != security + '.ivol']
 
 df_all = df_all[features_securities + features_macro + features_sectors]
 
@@ -123,11 +137,11 @@ np.random.seed(seed)
 def baseline_model():
     # create model
     model = Sequential()
-    model.add(Dense(64, 
+    model.add(Dense(256, 
                     kernel_initializer='normal', 
                     activation='sigmoid'))
     model.add(Dropout(0.5))
-    model.add(Dense(32, 
+    model.add(Dense(64, 
                     kernel_initializer='normal', 
                     activation='sigmoid'))
     model.add(Dropout(0.5))
@@ -153,13 +167,14 @@ clf = pipeline
 # Results: -53.58 (32.51) MSE (sigmoid, [512,1]) - wider
 
 clf.fit(X_train, y_train)
-print('Accuracy on training set: {:.2f}'.format(clf.score(X_train, y_train)))
-print('Accuracy on test set: {:.2f}'.format(clf.score(X_test, y_test)))
+score_train = clf.score(X_train, y_train)
+score_test = clf.score(X_test, y_test)
+print('Accuracy on training set: {:.2f}'.format(score_train))
+print('Accuracy on test set: {:.2f}'.format(score_test))
 y_train_pred = clf.predict(X_train)
 y_test_pred = clf.predict(X_test)
 
 # plot training and test sets
-import matplotlib.pyplot as plt
 df_train_plot = pd.DataFrame({'date': d_train, 'ivol': y_train, 'model': y_train_pred})
 df_test_plot = pd.DataFrame({'date': d_test, 'ivol': y_test, 'model': y_test_pred})
 plt.figure()
@@ -169,6 +184,7 @@ plt.plot(df_test_plot['date'], df_test_plot['ivol'], label='', c="cornflowerblue
 plt.plot(df_test_plot['date'], df_test_plot['model'], label='predictions', c="green", linewidth=2)
 plt.title(str(clf).split('(')[0] + " @ " + target)
 plt.legend()
+plt.text(6, 6, 'test', fontsize=15)
 plt.show()
 plt.savefig(target + "_plot.png")
 
