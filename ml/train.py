@@ -118,7 +118,6 @@ from keras import regularizers
 from keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import KFold
-from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
 config = tf.ConfigProto( device_count = {'GPU': 1 , 'CPU': 4} ) 
